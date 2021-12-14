@@ -20,7 +20,7 @@ import requests
 
 banner = """
 =========================================================================
-================ BombCrypto Bot - Version BTS22 1.2.0 ===================
+================ BombCrypto Bot - Version BTS22 1.2.1 ===================
 =========================================================================
 
  ███████████  ███████████  █████████   ████████   ████████ 
@@ -803,7 +803,7 @@ def randomMouseMovement():
     hc.move((int(x), int(y)), np.random.randint(1,3))
 
 def checkUpdates():
-    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/version')
+    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/version.yaml')
 
     if data is not None:
         v = yaml.safe_load(data.text)
