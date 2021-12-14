@@ -59,6 +59,7 @@ try:
     stream.close()
 except FileNotFoundError:
     print('Error: Config file not found, rename EXAMPLE-config.yaml to config.yaml inside /config folder')
+    print('Erro: Arquivo config nao encontrado, renomear EXAMPLE-config.yaml para config.yaml dentro da pasta /config')
     exit()
 
 telegramIntegration = False
@@ -186,7 +187,7 @@ def sendTelegramMessage(message):
                 TBot.send_message(text=message, chat_id=chat_id)
     except:
         #logger('Error to send telegram message. See configuration file', emoji='📄')
-        logger('')
+        return
 
 def sendTelegramPrint():
     if telegramIntegration == False:
