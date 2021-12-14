@@ -812,7 +812,7 @@ def randomMouseMovement():
     hc.move((int(x), int(y)), np.random.randint(1,3))
 
 def checkUpdates():
-    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/version.yaml')
+    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/config/version.yaml')
     try:
         streamVersionGithub = yaml.safe_load(data.text)
         version = streamVersionGithub['version']
@@ -835,7 +835,8 @@ def checkUpdates():
         if version > versionLocal:
             logger('New version ' + version +' available, please update', telegram=True, emoji='🎉')
     else:
-        print('File /config/version.yaml not found')
+        logger('Version not found, update is required', telegram=True, emoji='💥')
+        exit()
     
 def main():
 
