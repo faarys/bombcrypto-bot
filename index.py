@@ -812,7 +812,7 @@ def randomMouseMovement():
     hc.move((int(x), int(y)), np.random.randint(1,3))
 
 def checkUpdates():
-    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/config/version.yaml')
+    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/config/version.yaml')
     try:
         streamVersionGithub = yaml.safe_load(data.text)
         version = streamVersionGithub['version']
