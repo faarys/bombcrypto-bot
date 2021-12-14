@@ -20,7 +20,7 @@ import requests
 
 banner = """
 =========================================================================
-================ BombCrypto Bot - Version BTS22 1.1.1 ===================
+================ BombCrypto Bot - Version BTS22 1.2.0 ===================
 =========================================================================
 
  ███████████  ███████████  █████████   ████████   ████████ 
@@ -74,7 +74,7 @@ def logger(message, telegram=False, emoji=None):
         console_message = "{} - {} {}".format(formatted_datetime, emoji, message)
 
     print(console_message)
-
+    
     if telegram == True:
         sendTelegramMessage(service_message)
 
@@ -803,7 +803,7 @@ def randomMouseMovement():
     hc.move((int(x), int(y)), np.random.randint(1,3))
 
 def checkUpdates():
-    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/config.yaml')
+    data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/version')
 
     if data is not None:
         v = yaml.safe_load(data.text)
@@ -821,6 +821,7 @@ def checkUpdates():
 
 
 def main():
+
     checkUpdates()
     input('Press Enter to start the bot...')
     logger('Starting bot...', telegram=True, emoji='🤖')
