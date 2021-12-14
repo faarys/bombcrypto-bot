@@ -4,3 +4,7 @@
 
 # vscode plugins
 /.history
+
+# example file
+/config/config.yaml
+/config/telegram.yaml
