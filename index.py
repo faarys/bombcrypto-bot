@@ -16,11 +16,11 @@ import yaml
 import random
 import requests
 
-# TODO: add kill bot on button pressed, server maintenance, auto update com os valores anteriores da config
+btsversion = "1.2.4"
 
 banner = """
 =========================================================================
-================ BombCrypto Bot - Version BTS22 1.2.2 ===================
+=========================== BombCrypto Bot ==============================
 =========================================================================
 
  ███████████  ███████████  █████████   ████████   ████████ 
@@ -811,12 +811,12 @@ def checkUpdates():
         data.close()
     else:
         logger('Version not found, exiting', emoji='💥')
-        time.sleep(3)
-        exit()
+        #time.sleep(3)
+        #exit()
 
     print('Git Version: ' + version)
-    print('Version installed: ' + c['version'])
-    if version > c['version']:
+    print('Version installed: ' + btsversion)
+    if version > btsversion:
         logger('New version available, please update', telegram=True, emoji='🎉')
 
 
