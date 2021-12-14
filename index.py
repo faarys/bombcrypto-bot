@@ -16,23 +16,21 @@ import yaml
 import random
 import requests
 
-btsversion = "1.2.4"
-
 banner = """
 =========================================================================
 =========================== BombCrypto Bot ==============================
 =========================================================================
 
- ███████████  ███████████  █████████   ████████   ████████ 
-░░███░░░░░███░█░░░███░░░█ ███░░░░░███ ███░░░░███ ███░░░░███
- ░███    ░███░   ░███  ░ ░███    ░░░ ░░░    ░███░░░    ░███
- ░██████████     ░███    ░░█████████    ███████    ███████ 
- ░███░░░░░███    ░███     ░░░░░░░░███  ███░░░░    ███░░░░  
- ░███    ░███    ░███     ███    ░███ ███      █ ███      █
- ███████████     █████   ░░█████████ ░██████████░██████████
-░░░░░░░░░░░     ░░░░░     ░░░░░░░░░  ░░░░░░░░░░ ░░░░░░░░░░ 
+        ███████████  ███████████  █████████   ████████   ████████ 
+       ░░███░░░░░███░█░░░███░░░█ ███░░░░░███ ███░░░░███ ███░░░░███
+        ░███    ░███░   ░███  ░ ░███    ░░░ ░░░    ░███░░░    ░███
+        ░██████████     ░███    ░░█████████    ███████    ███████ 
+        ░███░░░░░███    ░███     ░░░░░░░░███  ███░░░░    ███░░░░  
+        ░███    ░███    ░███     ███    ░███ ███      █ ███      █
+        ███████████     █████   ░░█████████ ░██████████░██████████
+       ░░░░░░░░░░░     ░░░░░     ░░░░░░░░░  ░░░░░░░░░░ ░░░░░░░░░░ 
 =========================================================================
-================ Please consider buying me a coffee :) =================
++================ Please consider buying me a coffee :) =================
 =========================================================================
 ============== 0x7e665768270dF85A1D398498F9694C17e646Aa8C ===============
 ================================= PIX ===================================
@@ -45,48 +43,41 @@ banner = """
 
 >>---> Some configs can be found in the config.yaml file.
 
+=========================================================================
 """
 
 print(banner)
 
-
-stream = open("config.yaml", 'r')
-if stream is not None:
-    c = yaml.safe_load(stream)
-    ct = c['threshold']
-    t = c['time_intervals']
-    telegram_data = c['telegram']
-    bts_data = c['bts-key']
-    metamask_data = c['metamask']
-    chest_data = c['value_chests']
-    offsets = c['offsets']
+try:
+    stream = open("./config/config.yaml", 'r')
+    streamConfig = yaml.safe_load(stream)
+    configThreshold = streamConfig['threshold']
+    configTimeIntervals = streamConfig['time_intervals']
+    metamaskData = streamConfig['metamask']
+    chestData = streamConfig['value_chests']
+    offsets = streamConfig['offsets']
     stream.close()
-else:
-    logger('Config file not found, exiting', emoji='😿')
-    time.sleep(3)
+except FileNotFoundError:
+    print('Error: Config file not found, rename EXAMPLE-config.yaml to config.yaml inside /config folder')
     exit()
 
-def logger(message, telegram=False, emoji=None):
-    formatted_datetime = dateFormatted()
-    console_message = "{} - {}".format(formatted_datetime, message)
-    service_message = "⏰{}\n{} {}".format(formatted_datetime, emoji, message)
-    if emoji is not None and c['emoji'] is True:
-        console_message = "{} - {} {}".format(formatted_datetime, emoji, message)
-
-    print(console_message)
-    
-    if telegram == True:
-        sendTelegramMessage(service_message)
-
-    if (c['save_log_to_file'] == True):
-        logger_file = open("./logs/logger.log", "a", encoding='utf-8')
-        logger_file.write(console_message + '\n')
-        logger_file.close()
-    return True
-
+telegramIntegration = False
+try:
+    stream = open("./config/telegram.yaml", 'r')
+    streamConfigTelegram = yaml.safe_load(stream)
+    telegramIntegration = streamConfigTelegram['telegram_enable']
+    telegramChatId = streamConfigTelegram['telegram_chat_id']
+    telegramBotToken = streamConfigTelegram['telegram_bot_token']
+    telegramCoinReport = streamConfigTelegram['enable_coin_report']
+    telegramMapReport = streamConfigTelegram['enable_map_report']
+    telegramFormatImage = streamConfigTelegram['format_of_images']
+    TelegramEmergencyCall = streamConfigTelegram['enable_emergency_call']
+    stream.close()
+except FileNotFoundError:
+    print('Info: Telegram not configure, rename EXAMPLE-telegram.yaml to telegram.yaml')
 
 hc = HumanClicker()
-pyautogui.PAUSE = c['time_intervals']['interval_between_movements']
+pyautogui.PAUSE = streamConfig['time_intervals']['interval_between_movements']
 pyautogui.FAILSAFE = False
 general_check_time = 1
 check_for_updates = 15
@@ -94,8 +85,8 @@ check_for_updates = 15
 heroes_clicked = 0
 heroes_clicked_total = 0
 login_attempts = 0
-next_refresh_heroes = t['send_heroes_for_work'][0]
-next_refresh_heroes_positions = t['refresh_heroes_positions'][0]
+next_refresh_heroes = configTimeIntervals['send_heroes_for_work'][0]
+next_refresh_heroes_positions = configTimeIntervals['refresh_heroes_positions'][0]
 
 go_work_img = cv2.imread('./images/targets/go-work.png')
 home_img = cv2.imread('./images/targets/home.png')
@@ -126,19 +117,37 @@ chest2 = cv2.imread('./images/targets/chest2.png')
 chest3 = cv2.imread('./images/targets/chest3.png')
 chest4 = cv2.imread('./images/targets/chest4.png')
 
+def logger(message, telegram=False, emoji=None):
+    formatted_datetime = dateFormatted()
+    console_message = "{} - {}".format(formatted_datetime, message)
+    service_message = "⏰{}\n{} {}".format(formatted_datetime, emoji, message)
+    if emoji is not None and streamConfig['emoji'] is True:
+        console_message = "{} - {} {}".format(formatted_datetime, emoji, message)
+
+    print(console_message)
+    
+    if telegram == True:
+        sendTelegramMessage(service_message)
+
+    if (streamConfig['save_log_to_file'] == True):
+        logger_file = open("./logs/logger.log", "a", encoding='utf-8')
+        logger_file.write(console_message + '\n')
+        logger_file.close()
+    return True
+
 # Initialize telegram
-if telegram_data['telegram_mode'] == True:
+if telegramIntegration == True:
     logger('Initializing Telegram...', emoji='📱')
-    updater = Updater(telegram_data["telegram_bot_key"])
+    updater = Updater(telegramBotToken)
 
     try:
-        TBot = telegram.Bot(token=telegram_data["telegram_bot_key"])
+        TBot = telegram.Bot(token=telegramBotToken)
 
         def send_print(update: Update, context: CallbackContext) -> None:
             update.message.reply_text('🔃 Proccessing...')
             screenshot = printScreen()
-            cv2.imwrite('./logs/print-report.%s' % telegram_data["format_of_images"], screenshot)
-            update.message.reply_photo(photo=open('./logs/print-report.%s' % telegram_data["format_of_images"], 'rb'))
+            cv2.imwrite('./logs/print-report.%s' % telegramFormatImage, screenshot)
+            update.message.reply_photo(photo=open('./logs/print-report.%s' % telegramFormatImage, 'rb'))
 
         def send_id(update: Update, context: CallbackContext) -> None:
             update.message.reply_text(f'🆔 Your id is: {update.effective_user.id}')
@@ -169,39 +178,39 @@ if telegram_data['telegram_mode'] == True:
         logger('Bot not initialized, see configuration file', emoji='🤖')
 
 def sendTelegramMessage(message):
-    if telegram_data['telegram_mode'] == False:
+    if telegramIntegration == False:
         return
     try:
-        if(len(telegram_data["telegram_chat_id"]) > 0):
-            for chat_id in telegram_data["telegram_chat_id"]:
+        if(len(telegramChatId) > 0):
+            for chat_id in telegramChatId:
                 TBot.send_message(text=message, chat_id=chat_id)
     except:
         logger('Error to send telegram message. See configuration file', emoji='📄')
 
 def sendTelegramPrint():
-    if telegram_data['telegram_mode'] == False:
+    if telegramIntegration == False:
         return
     try:
-        if(len(telegram_data["telegram_chat_id"]) > 0):
+        if(len(telegramChatId) > 0):
             screenshot = printScreen()
-            cv2.imwrite('./logs/print-report.%s' % telegram_data["format_of_images"], screenshot)
-            for chat_id in telegram_data["telegram_chat_id"]:
-                TBot.send_photo(chat_id=chat_id, photo=open('./logs/print-report.%s' % telegram_data["format_of_images"], 'rb'))
+            cv2.imwrite('./logs/print-report.%s' % telegramFormatImage, screenshot)
+            for chat_id in telegramChatId:
+                TBot.send_photo(chat_id=chat_id, photo=open('./logs/print-report.%s' % telegramFormatImage, 'rb'))
     except:
         logger('Error to send telegram message. See configuration file', emoji='📄')
 
 def sendPossibleAmountReport(baseImage):
-    if telegram_data['telegram_mode'] == False:
+    if telegramIntegration == False:
         return
-    c1 = len(positions(chest1, ct['chest'], baseImage, True))
-    c2 = len(positions(chest2, ct['chest'], baseImage, True))
-    c3 = len(positions(chest3, ct['chest'], baseImage, True))
-    c4 = len(positions(chest4, ct['chest'], baseImage, True))
+    c1 = len(positions(chest1, configThreshold['chest'], baseImage, True))
+    c2 = len(positions(chest2, configThreshold['chest'], baseImage, True))
+    c3 = len(positions(chest3, configThreshold['chest'], baseImage, True))
+    c4 = len(positions(chest4, configThreshold['chest'], baseImage, True))
     
-    value1 = c1 * chest_data["value_chest1"]
-    value2 = c2 * chest_data["value_chest2"]
-    value3 = c3 * chest_data["value_chest3"]
-    value4 = c4 * chest_data["value_chest4"]
+    value1 = c1 * chestData["value_chest1"]
+    value2 = c2 * chestData["value_chest2"]
+    value3 = c3 * chestData["value_chest3"]
+    value4 = c4 * chestData["value_chest4"]
 
     total = value1 + value2 + value3 + value4
 
@@ -217,9 +226,9 @@ Possible quantity chest per type:
     logger(report, telegram=True)
 
 def sendBCoinReport():
-    if telegram_data['telegram_mode'] == False:
+    if telegramIntegration == False:
         return
-    if(len(telegram_data["telegram_chat_id"]) <= 0 or telegram_data["enable_coin_report"] is False):
+    if(len(telegramChatId) <= 0 or telegramCoinReport is False):
         return
 
     if currentScreen() == "main":
@@ -244,14 +253,14 @@ def sendBCoinReport():
         x, y, w, h = coin[0]
 
         with mss.mss() as sct:
-            sct_img = np.array(sct.grab(sct.monitors[c['monitor_to_use']]))
+            sct_img = np.array(sct.grab(sct.monitors[streamConfig['monitor_to_use']]))
             crop_img = sct_img[y:y+h, x:x+w]
-            cv2.imwrite('./logs/bcoin-report.%s' % telegram_data["format_of_images"], crop_img)
+            cv2.imwrite('./logs/bcoin-report.%s' % telegramFormatImage, crop_img)
             time.sleep(1)
             try:
-                for chat_id in telegram_data["telegram_chat_id"]:
+                for chat_id in telegramChatId:
                     # TBot.send_document(chat_id=chat_id, document=open('bcoin-report.png', 'rb'))
-                    TBot.send_photo(chat_id=chat_id, photo=open('./logs/bcoin-report.%s' % telegram_data["format_of_images"], 'rb'))
+                    TBot.send_photo(chat_id=chat_id, photo=open('./logs/bcoin-report.%s' % telegramFormatImage, 'rb'))
             except:
                 logger('Telegram offline', emoji='😿')
     clickButton(x_button_img)
@@ -259,9 +268,9 @@ def sendBCoinReport():
     return True
 
 def sendMapReport():
-    if telegram_data['telegram_mode'] == False:
+    if telegramIntegration == False:
         return
-    if(len(telegram_data["telegram_chat_id"]) <= 0 or telegram_data["enable_map_report"] is False):
+    if(len(telegramChatId) <= 0 or telegramMapReport is False):
         return
 
     if currentScreen() == "main":
@@ -289,16 +298,16 @@ def sendMapReport():
     newX1 = x1 + w
 
     with mss.mss() as sct:
-        sct_img = np.array(sct.grab(sct.monitors[c['monitor_to_use']]))
+        sct_img = np.array(sct.grab(sct.monitors[streamConfig['monitor_to_use']]))
         crop_img = sct_img[newY0:newY1, newX0:newX1]
         # resized = cv2.resize(crop_img, (500, 250))
 
-        cv2.imwrite('./logs/map-report.%s' % telegram_data["format_of_images"], crop_img)
+        cv2.imwrite('./logs/map-report.%s' % telegramFormatImage, crop_img)
         time.sleep(1)
         try:
-            for chat_id in telegram_data["telegram_chat_id"]:
+            for chat_id in telegramChatId:
                 # TBot.send_document(chat_id=chat_id, document=open('map-report.png', 'rb'))
-                TBot.send_photo(chat_id=chat_id, photo=open('./logs/map-report.%s' % telegram_data["format_of_images"], 'rb'))
+                TBot.send_photo(chat_id=chat_id, photo=open('./logs/map-report.%s' % telegramFormatImage, 'rb'))
         except:
             logger('Telegram offline', emoji='😿')
 
@@ -311,7 +320,7 @@ def sendMapReport():
     logger('Map report sent', telegram=True, emoji='📄')
     return True
 
-def clickButton(img,name=None, timeout=3, threshold = ct['default']):
+def clickButton(img,name=None, timeout=3, threshold = configThreshold['default']):
     if not name is None:
         pass
     start = time.time()
@@ -339,7 +348,7 @@ def printScreen():
     with mss.mss() as sct:
         # The screen part to capture
         # Grab the data
-        sct_img = np.array(sct.grab(sct.monitors[c['monitor_to_use']]))
+        sct_img = np.array(sct.grab(sct.monitors[streamConfig['monitor_to_use']]))
         return sct_img[:,:,:3]
 
 def printSreen():
@@ -352,7 +361,7 @@ def printSreen():
         # Grab the data
         return sct_img[:,:,:3]
 
-def positions(target, threshold=ct['default'], base_img=None, return_0=False):
+def positions(target, threshold=configThreshold['default'], base_img=None, return_0=False):
     if base_img is None:
         img = printScreen()
     else:
@@ -432,7 +441,7 @@ def show(rectangles = None, img = None):
 
     if img is None:
         with mss.mss() as sct:
-            img = np.array(sct.grab(sct.monitors[c['monitor_to_use']]))
+            img = np.array(sct.grab(sct.monitors[streamConfig['monitor_to_use']]))
 
     if rectangles is not None:
         for (x, y, w, h) in rectangles:
@@ -466,23 +475,23 @@ def scroll():
     x, y, w, h = character_indicator_pos[0]
     hc.move((int(x+(w/2)),int(y+h+offset_random)), np.random.randint(1,2))
 
-    if not c['use_click_and_drag_instead_of_scroll']:
+    if not streamConfig['use_click_and_drag_instead_of_scroll']:
         pyautogui.click()
-        pyautogui.scroll(-c['scroll_size'])
+        pyautogui.scroll(-streamConfig['scroll_size'])
     else:
-        # pyautogui.dragRel(0,-c['click_and_drag_amount'],duration=1, button='left')
+        # pyautogui.dragRel(0,-streamConfig['click_and_drag_amount'],duration=1, button='left')
         pyautogui.mouseDown(button='left')
-        hc.move((int(x),int(y+(-c['click_and_drag_amount']))), np.random.randint(1,2))
+        hc.move((int(x),int(y+(-streamConfig['click_and_drag_amount']))), np.random.randint(1,2))
         pyautogui.mouseUp(button='left')
 
 def clickButtons():
-    buttons = positions(go_work_img, threshold=ct['go_to_work_btn'])
+    buttons = positions(go_work_img, threshold=configThreshold['go_to_work_btn'])
     offset = offsets['work_button_all']
 
     if buttons is False:
         return
 
-    if c['debug'] is not False:
+    if streamConfig['debug'] is not False:
         logger('%d buttons detected' % len(buttons), emoji='✔️')
 
     for (x, y, w, h) in buttons:
@@ -513,13 +522,13 @@ def isWorking(bar, buttons):
 
 def clickGreenBarButtons():
     offset = offsets['work_button']
-    green_bars = positions(green_bar, threshold=ct['green_bar'])
-    buttons = positions(go_work_img, threshold=ct['go_to_work_btn'])
+    green_bars = positions(green_bar, threshold=configThreshold['green_bar'])
+    buttons = positions(go_work_img, threshold=configThreshold['go_to_work_btn'])
 
     if green_bars is False or buttons is False:
         return
 
-    if c['debug'] is not False:
+    if streamConfig['debug'] is not False:
         logger('%d green bars detected' % len(green_bars), emoji='🟩')
         logger('%d buttons detected' % len(buttons), emoji='🔳')
 
@@ -549,13 +558,13 @@ def clickGreenBarButtons():
 
 def clickFullBarButtons():
     offset = offsets['work_button_full']
-    full_bars = positions(full_stamina, threshold=ct['full_bar'])
-    buttons = positions(go_work_img, threshold=ct['go_to_work_btn'])
+    full_bars = positions(full_stamina, threshold=configThreshold['full_bar'])
+    buttons = positions(go_work_img, threshold=configThreshold['go_to_work_btn'])
 
     if full_bars is False or buttons is False:
         return
 
-    if c['debug'] is not False:
+    if streamConfig['debug'] is not False:
         logger('%d FULL bars detected' % len(full_bars), emoji='🟩')
         logger('%d buttons detected' % len(buttons), emoji='🔳')
 
@@ -627,7 +636,7 @@ def goToTreasureHunt():
 def refreshHeroesPositions():
     logger('Refreshing heroes positions', emoji='🔃')
     global next_refresh_heroes_positions
-    next_refresh_heroes_positions = random.uniform(t['refresh_heroes_positions'][0], t['refresh_heroes_positions'][1])
+    next_refresh_heroes_positions = random.uniform(configTimeIntervals['refresh_heroes_positions'][0], configTimeIntervals['refresh_heroes_positions'][1])
     if currentScreen() == "thunt":
         if clickButton(arrow_img):
             time.sleep(5)
@@ -655,11 +664,11 @@ def login():
 
     metamask_unlock_coord = positions(metamask_unlock_img)
     if metamask_unlock_coord is not False:
-        if(metamask_data["enable_login_metamask"] is False):
+        if(metamaskData["enable_login_metamask"] is False):
             logger('Metamask locked! But login with password is disabled, exiting', emoji='🔒')
             exit()
         logger('Found unlock button. Waiting for password', emoji='🔓')
-        password = metamask_data["password"]
+        password = metamaskData["password"]
         pyautogui.typewrite(password, interval=0.1)
         sleep(1, 3)
         if clickButton(metamask_unlock_img):
@@ -697,7 +706,7 @@ def login():
     handleError()
 
 def handleError():
-    if positions(error_img, ct['error']) is not False:
+    if positions(error_img, configThreshold['error']) is not False:
         sendTelegramPrint()
         logger('Error detected, trying to resolve', telegram=True, emoji='💥')
         clickButton(ok_btn_img)
@@ -717,24 +726,24 @@ def getMoreHeroes():
 
     goToHeroes()
 
-    if c['select_heroes_mode'] == "full":
+    if streamConfig['select_heroes_mode'] == "full":
         logger('Sending heroes with full stamina bar to work!', emoji='⚒️')
-    elif c['select_heroes_mode'] == "green":
+    elif streamConfig['select_heroes_mode'] == "green":
         logger('Sending heroes with green stamina bar to work!', emoji='⚒️')
     else:
         logger('Sending all heroes to work!', emoji='⚒️')
 
     buttonsClicked = 0
     heroes_clicked = 0
-    empty_scrolls_attempts = c['scroll_attempts']
-    next_refresh_heroes = random.uniform(t['send_heroes_for_work'][0], t['send_heroes_for_work'][1])
+    empty_scrolls_attempts = streamConfig['scroll_attempts']
+    next_refresh_heroes = random.uniform(configTimeIntervals['send_heroes_for_work'][0], configTimeIntervals['send_heroes_for_work'][1])
 
     while(empty_scrolls_attempts > 0):
-        if c['select_heroes_mode'] == 'full':
+        if streamConfig['select_heroes_mode'] == 'full':
             buttonsClicked = clickFullBarButtons()
             if buttonsClicked is not None:
                 heroes_clicked += buttonsClicked
-        elif c['select_heroes_mode'] == 'green':
+        elif streamConfig['select_heroes_mode'] == 'green':
             buttonsClicked = clickGreenBarButtons()
             if buttonsClicked is not None:
                 heroes_clicked += buttonsClicked
@@ -804,22 +813,30 @@ def randomMouseMovement():
 
 def checkUpdates():
     data = requests.get('https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/version.yaml')
-
-    if data is not None:
-        v = yaml.safe_load(data.text)
-        version = v['version']
-        data.close()
-    else:
-        logger('Version not found, exiting', emoji='💥')
-        #time.sleep(3)
-        #exit()
+    try:
+        streamVersionGithub = yaml.safe_load(data.text)
+        version = streamVersionGithub['version']
+    except KeyError:
+        logger('Version not found in github', emoji='💥')
+        version = "0"
 
     print('Git Version: ' + version)
-    print('Version installed: ' + btsversion)
-    if version > btsversion:
-        logger('New version available, please update', telegram=True, emoji='🎉')
 
+    try:
+        streamVersionLocal = open("./config/version.yaml", 'r')
+        streamVersion = yaml.safe_load(streamVersionLocal)
+        versionLocal = streamVersion['version']
+        stream.close()
+    except FileNotFoundError:
+        versionLocal = None
 
+    if versionLocal is not None:        
+        print('Version installed: ' + versionLocal)
+        if version > versionLocal:
+            logger('New version ' + version +' available, please update', telegram=True, emoji='🎉')
+    else:
+        print('File /config/version.yaml not found')
+    
 def main():
 
     checkUpdates()
