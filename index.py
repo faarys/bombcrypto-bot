@@ -185,7 +185,8 @@ def sendTelegramMessage(message):
             for chat_id in telegramChatId:
                 TBot.send_message(text=message, chat_id=chat_id)
     except:
-        logger('Error to send telegram message. See configuration file', emoji='📄')
+        #logger('Error to send telegram message. See configuration file', emoji='📄')
+        logger('')
 
 def sendTelegramPrint():
     if telegramIntegration == False:
