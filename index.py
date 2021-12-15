@@ -59,7 +59,7 @@ try:
     stream.close()
 except FileNotFoundError:
     print('Error: Config file not found, rename EXAMPLE-config.yaml to config.yaml inside /config folder')
-    print('Erro: Arquivo config nao encontrado, renomear EXAMPLE-config.yaml para config.yaml dentro da pasta /config')
+    print('Erro: Arquivo config não encontrado, renomear EXAMPLE-config.yaml para config.yaml dentro da pasta /config')
     exit()
 
 telegramIntegration = False
@@ -137,6 +137,7 @@ def logger(message, telegram=False, emoji=None):
     return True
 
 # Initialize telegram
+updater = None
 if telegramIntegration == True:
     logger('Initializing Telegram...', emoji='📱')
     updater = Updater(telegramBotToken)
@@ -682,7 +683,8 @@ def login():
         if clickButton(sign_btn_img): ## twice because metamask glitch
             logger('Found glitched sign button. Waiting to check if logged in', emoji='✔️')
         # time.sleep(25)
-        waitForImage(teasureHunt_icon_img, timeout=60)
+        waitForImage(teasureHunt_icon_img, timeout=30)
+        handleError()
 
     if currentScreen() == "main":
         logger('Logged in', telegram=True, emoji='🎉')
@@ -802,6 +804,15 @@ def waitForImage(imgs, timeout=30, threshold=0.5, multiple=False):
                 continue
             return True
 
+def clickNewMap():
+    logger('New map', emoji='🗺️')
+    sleep(1, 2)
+    checkCaptcha()
+    sleep(2, 3)
+    sendMapReport()
+    sleep(3, 5)
+    sendBCoinReport()
+
 def sleep(min, max):
 	sleep = random.uniform(min,max)
 	randomMouseMovement()
@@ -843,7 +854,7 @@ def checkUpdates():
 def main():
 
     checkUpdates()
-    input('Press Enter to start the bot...')
+    input('Press Enter to start the bot...\n')
     logger('Starting bot...', telegram=True, emoji='🤖')
 
     last = {
@@ -876,14 +887,8 @@ def main():
 
         if currentScreen() == "thunt":
             if clickButton(new_map_btn_img):
-                logger('New map', emoji='🗺️')
                 last["new_map"] = now
-                sleep(1, 2)
-                checkCaptcha()
-                sleep(2, 3)
-                sendMapReport()
-                sleep(3, 5)
-                sendBCoinReport()
+                clickNewMap()
                 
         if currentScreen() == "character":
             clickButton(x_button_img)
@@ -906,5 +911,6 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         logger('Shutting down the bot', telegram=True, emoji='😓')
-        updater.stop()
+        if(updater):
+            updater.stop()
         exit()
