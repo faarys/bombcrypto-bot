@@ -50,7 +50,7 @@ def positions(target, threshold=0.80,img = None):
     rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
     return rectangles
 
-def getDigits(d,img, gray=True, threshold=0.78):
+def getDigits(d,img, gray=True, threshold=0.81):
     digits = []
     for i in range(10):
         if gray:
@@ -294,11 +294,3 @@ def solveCaptcha():
 
 if __name__ == '__main__':
     solveCaptcha()
-#TODO colocar positions em um arquivo separado e importar nos outros.
-# tirar o load digits daqui e passar como argumento na funçao
-
-        # (_, new_diff) = structural_similarity(img0,img1, full=True)
-        # diff[0] = (new_diff * 255).astype("uint8")
-# arrumar o mexer das posiçoes pra ele vazer mais movimentos verticais
-# calcular n de sliders ou fazer recursivamente.
-# fazer os and so no final
