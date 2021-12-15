@@ -5,6 +5,8 @@ import numpy as np
 import mss
 from os import listdir
 from random import randint
+import threading
+# from skimage.metrics import structural_similarity
 
 
 def remove_suffix(input_string, suffix):
@@ -13,10 +15,7 @@ def remove_suffix(input_string, suffix):
     return input_string
 
 #TODO tirar duplicata
-def load_images():
-    dir_name = './captcha/images/'
-    if __name__ == '__main__':
-        dir_name = './images/'
+def load_images(dir_name):
     file_names = listdir(dir_name)
     targets = {}
     for file in file_names:
@@ -24,10 +23,16 @@ def load_images():
         targets[remove_suffix(file, '.png')] = cv2.imread(path)
 
     return targets
-d = load_images()
+
+if __name__ == '__main__':
+    d = load_images( './images/')
+    s = load_images( './small-digits/')
+else:
+    d = load_images( './captcha/images/')
+    s = load_images( './captcha/small-digits/')
 
 #TODO tirar duplicata
-def positions(target, threshold=0.85,img = None):
+def positions(target, threshold=0.80,img = None):
     if img is None:
         img = printSreen()
     result = cv2.matchTemplate(img,target,cv2.TM_CCOEFF_NORMED)
@@ -45,10 +50,15 @@ def positions(target, threshold=0.85,img = None):
     rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
     return rectangles
 
-def getDigits(d,img):
+def getDigits(d,img, gray=True, threshold=0.78):
     digits = []
     for i in range(10):
-        p = positions(d[str(i)],img=img,threshold=0.95)
+        if gray:
+            template = cv2.cvtColor(d[str(i)], cv2.COLOR_BGR2GRAY)
+        else:
+            template = d[str(i)]
+
+        p = positions(template,img=img,threshold=threshold)
         if len (p) > 0:
             digits.append({'digit':str(i),'x':p[0][0]})
 
@@ -70,12 +80,24 @@ def printSreen():
         # Grab the data
         return sct_img[:,:,:3]
 
-def captchaImg(img, pos,w = 500, h = 280):
+def captchaImg(img, pos,w = 520, h = 180):
     # path = "./captchas-saved/{}.png".format(str(time.time()))
     rx, ry, _, _ = pos
 
     x_offset = -10
-    y_offset = 89
+    y_offset = 140
+
+    y = ry + y_offset
+    x = rx + x_offset
+    cropped = img[ y : y + h , x: x + w]
+    return cropped
+
+def smallDigitsImg(img, pos,w = 200, h = 70):
+    # path = "./captchas-saved/{}.png".format(str(time.time()))
+    rx, ry, _, _ = pos
+
+    x_offset = 150
+    y_offset = 80
 
     y = ry + y_offset
     x = rx + x_offset
@@ -132,16 +154,109 @@ def getSliderPositions(screenshot, popup_pos):
         # time.sleep(2)
         # pyautogui.mouseUp()
     return positions
+def r():
+    return randint(0,5)
+
+def moveToReveal(popup_pos):
+    # time.sleep(10)
+    # return
+    x,y,_,_ = popup_pos
+    t = 1.5
+    offset_x = 80
+    offset_y = 140
+    w = 413
+    h = 150
+    passes = 11
+    increment_x = w/passes
+    increment_y = h/passes
+    start_x = x + offset_x + r()
+    start_y = y + offset_y + r()
+    pyautogui.moveTo(start_x,start_y,t)
+    pyautogui.moveTo(start_x,start_y+h,t)
+    pyautogui.moveTo(start_x + w,start_y + h,t)
+    pyautogui.moveTo(start_x + w,start_y,t)
+    for i in range(passes):
+        x = start_x + i * increment_x + r()
+        y = start_y + h * (i % 2) + r()
+        pyautogui.moveTo(x,y,t)
+    pyautogui.moveTo(start_x+ w + r(),start_y + h + r(),t)
+    time.sleep(1)
+
+def lookAtCaptcha():
+    screenshot = printSreen()
+    popup_pos = positions(d['robot'],img=screenshot)
+    img = captchaImg(screenshot, popup_pos[0])
+    return img
+
+# def generateDiff(first,position):
+    # gray_first = cv2.cvtColor(first, cv2.COLOR_BGR2GRAY)
+    # screenshot = printSreen()
+    # img = screenshot.copy()
+    # second = captchaImg(img,position)
+    # gray_second = cv2.cvtColor(second, cv2.COLOR_BGR2GRAY)
+
+
+    # (_, diff) = structural_similarity(gray_first,gray_second, full=True)
+    # diff = (diff * 255).astype("uint8")
+    # cv2.imshow('img',diff)
+    # cv2.waitKey(5000)
+
+    # cv2.imshow('img',cp)
+    # return diff
+
+def preProcess(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    t,img = cv2.threshold(img,170,240,cv2.THRESH_BINARY_INV)
+    return img
+def add(img0, img1):
+    return cv2.bitwise_and(img0, img1, mask = None)
+
+def getDiff(data):
+    if data[0] is None:
+        img0 = preProcess(lookAtCaptcha())
+        img1 = preProcess(lookAtCaptcha())
+        data[0] = add(img0,img1)
+    while data[1]:
+        now = preProcess(lookAtCaptcha())
+        data[0] = add(data[0],now)
+    return
+        # time.sleep()
+
+def watchDiffs(data):
+    thread = threading.Thread(target=getDiff, args =(data,))
+    thread.start()
+    return thread
+    # thread.join()
+
 
 def getBackgroundText():
     screenshot = printSreen()
     popup_pos = positions(d['robot'],img=screenshot)
-    img = captchaImg(screenshot, popup_pos[0])
-    cv2.imshow('img',img)
-    cv2.waitKey(0)
+    data = [None,True]
+    thread = watchDiffs(data)
+    moveToReveal(popup_pos[0])
+    # moveToReveal(popup_pos[0])
+    data[1]=False
+    thread.join()
+    if __name__ == '__main__':
+        path = "./tmp/{}.png".format(str(time.time()))
+        cv2.imwrite(path,data[0])
+    digits = getDigits(d,data[0])
+    # cv2.imshow('test',data[0])
+    # cv2.waitKey(0)
+    # img = captchaImg(screenshot, popup_pos[0])
+    # cv2.imshow('img',img)
+    # cv2.waitKey(0)
+    return digits
 
-def getDigits():
-    pass
+def getSmallDigits(img):
+    if __name__ == '__main__':
+        path = "./tmp/small{}.png".format(str(time.time()))
+        # cv2.imwrite(path,img)
+    digits = getDigits(s,img, gray=False, threshold=0.95)
+    print('fg = {}'.format(digits))
+
+    return digits
 
 def solveCaptcha():
     screenshot = printSreen()
@@ -152,8 +267,8 @@ def solveCaptcha():
         return
     img = captchaImg(img, popup_pos[0])
     background_digits = getBackgroundText()
-    return
-    # slider_positions = getSliderPositions(screenshot, popup_pos)
+    print('background = {}'.format(background_digits))
+    slider_positions = getSliderPositions(screenshot, popup_pos)
 
     if slider_positions is None:
         return
@@ -165,11 +280,10 @@ def solveCaptcha():
         pyautogui.moveTo(x,y,1)
         screenshot = printSreen()
         popup_pos = positions(d['robot'],img=screenshot)
-        captcha_img = captchaImg(screenshot, popup_pos[0])
-        digits = getDigits()
-        # captcha_img = example_captcha_img
+        captcha_img = smallDigitsImg(screenshot, popup_pos[0])
+        small_digits = getSmallDigits(captcha_img)
         # print( 'dig: {}, background_digits: {}'.format(digits, background_digits))
-        if digits == background_digits:
+        if small_digits == background_digits:
             print('FOUND!')
             pyautogui.mouseUp()
             return
@@ -183,3 +297,8 @@ if __name__ == '__main__':
 #TODO colocar positions em um arquivo separado e importar nos outros.
 # tirar o load digits daqui e passar como argumento na funçao
 
+        # (_, new_diff) = structural_similarity(img0,img1, full=True)
+        # diff[0] = (new_diff * 255).astype("uint8")
+# arrumar o mexer das posiçoes pra ele vazer mais movimentos verticais
+# calcular n de sliders ou fazer recursivamente.
+# fazer os and so no final
