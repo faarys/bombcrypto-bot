@@ -1,0 +1,11 @@
+####     #######   ######    ###                               ######   #######    ###    #####    ##   ##  #######  
+ ##       ##   #     ##     ## ##                               ##  ##   ##   #   ## ##    ## ##   ### ###   ##   #  
+ ##       ##         ##    ##   ##                              ##  ##   ##      ##   ##   ##  ##  #######   ##      
+ ##       ####       ##    ##   ##                              #####    ####    ##   ##   ##  ##  ## # ##   ####    
+ ##       ##         ##    #######                              ## ##    ##      #######   ##  ##  ##   ##   ##      
+ ##  ##   ##   #     ##    ##   ##           ###                ## ##    ##   #  ##   ##   ## ##   ##   ##   ##   #  
+#######  #######   ######  ##   ##           ### #             #### ##  #######  ##   ##  #####    ### ###  ####### 
+
+ 
+ [pt_BR] CONFIGURAR E RENOMEAR o EXAMPLE-config.yaml para config.yaml dentro da pasta /config
+ [en_US] CONFIGURE AND RENAME EXAMPLE-config.yaml to config.yaml inside directory /config 
