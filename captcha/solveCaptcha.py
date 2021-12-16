@@ -164,12 +164,12 @@ def moveToReveal(popup_pos):
     # time.sleep(10)
     # return
     x,y,_,_ = popup_pos
-    t = 0.5
+    t = 2.5
     offset_x = 20
     offset_y = 140
     w = 453
     h = 160
-    passes = 18
+    passes = 26
     increment_x = w/passes
     increment_y = h/passes
     start_x = x + offset_x
