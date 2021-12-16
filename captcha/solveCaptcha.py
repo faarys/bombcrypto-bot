@@ -1,24 +1,17 @@
 from cv2 import cv2
-from pyclick import HumanClicker
-from os import listdir
-from random import randint
-
 import time
 import pyautogui
 import numpy as np
 import mss
+from os import listdir
+from random import randint
 import threading
-
-# from skimage.metrics import structural_similarity
-
-hc = HumanClicker()
 
 def remove_suffix(input_string, suffix):
     if suffix and input_string.endswith(suffix):
         return input_string[:-len(suffix)]
     return input_string
 
-#TODO tirar duplicata
 def load_images(dir_name):
     file_names = listdir(dir_name)
     targets = {}
@@ -44,6 +37,7 @@ def positions(target, threshold=0.80,img = None):
     h = target.shape[0]
 
     yloc, xloc = np.where(result >= threshold)
+
 
     rectangles = []
     for (x, y) in zip(xloc, yloc):
@@ -135,11 +129,9 @@ def getSliderPositions(screenshot, popup_pos):
         return None
     (start_x, start_y) = slider
 
-    # pyautogui.moveTo(start_x,start_y+randint(0,10),1)
-    hc.move((int(start_x), int(start_y+randint(0,10))), 1)
+    pyautogui.moveTo(start_x,start_y+randint(0,10),1)
     pyautogui.mouseDown()
-    # pyautogui.moveTo(start_x+400,start_y+randint(0,10),1)
-    hc.move((int(start_x+400), int(start_y+randint(0,10))), 1)
+    pyautogui.moveTo(start_x+400,start_y+randint(0,10),1)
 
     screenshot = printSreen()
 
@@ -153,13 +145,9 @@ def getSliderPositions(screenshot, popup_pos):
 
     positions = []
     for i in range(5):
-        # pyautogui.moveTo(start_x+increment*pos ,start_y+randint(0,10),1)
         positions.append((start_x+increment*i ,start_y+randint(0,10)))
-        # screenshot = printSreen()
-        # time.sleep(2)
-        # pyautogui.mouseUp()
-    return positions
 
+    return positions
 def r():
     return randint(0,5)
 
@@ -167,7 +155,7 @@ def moveToReveal(popup_pos):
     # time.sleep(10)
     # return
     x,y,_,_ = popup_pos
-    t = 0.5
+    t = 1.5
     offset_x = 80
     offset_y = 140
     w = 413
@@ -177,21 +165,15 @@ def moveToReveal(popup_pos):
     increment_y = h/passes
     start_x = x + offset_x + r()
     start_y = y + offset_y + r()
-    # pyautogui.moveTo(start_x, start_y, t)
-    # pyautogui.moveTo(start_x, start_y+h, t)
-    # pyautogui.moveTo(start_x + w, start_y + h, t)
-    # pyautogui.moveTo(start_x + w, start_y, t)
-    hc.move((int(start_x), int(start_y)), t)
-    hc.move((int(start_x), int(start_y + h)), t)
-    hc.move((int(start_x + w), int(start_y + h)), t)
-    hc.move((int(start_x + w), int(start_y)), t)
+    pyautogui.moveTo(start_x,start_y,t)
+    pyautogui.moveTo(start_x,start_y+h,t)
+    pyautogui.moveTo(start_x + w,start_y + h,t)
+    pyautogui.moveTo(start_x + w,start_y,t)
     for i in range(passes):
         x = start_x + i * increment_x + r()
         y = start_y + h * (i % 2) + r()
-        # pyautogui.moveTo(x,y,t)
-        hc.move((int(x), int(y)), t)
-    # pyautogui.moveTo(start_x+ w + r(),start_y + h + r(),t)
-    hc.move((int(start_x + w + r()), int(start_y + h + r())), t)
+        pyautogui.moveTo(x,y,t)
+    pyautogui.moveTo(start_x+ w + r(),start_y + h + r(),t)
     time.sleep(1)
 
 def lookAtCaptcha():
@@ -200,27 +182,10 @@ def lookAtCaptcha():
     img = captchaImg(screenshot, popup_pos[0])
     return img
 
-# def generateDiff(first,position):
-    # gray_first = cv2.cvtColor(first, cv2.COLOR_BGR2GRAY)
-    # screenshot = printSreen()
-    # img = screenshot.copy()
-    # second = captchaImg(img,position)
-    # gray_second = cv2.cvtColor(second, cv2.COLOR_BGR2GRAY)
-
-
-    # (_, diff) = structural_similarity(gray_first,gray_second, full=True)
-    # diff = (diff * 255).astype("uint8")
-    # cv2.imshow('img',diff)
-    # cv2.waitKey(5000)
-
-    # cv2.imshow('img',cp)
-    # return diff
-
 def preProcess(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     t,img = cv2.threshold(img,170,240,cv2.THRESH_BINARY_INV)
     return img
-
 def add(img0, img1):
     return cv2.bitwise_and(img0, img1, mask = None)
 
@@ -241,6 +206,7 @@ def watchDiffs(data):
     return thread
     # thread.join()
 
+
 def getBackgroundText():
     screenshot = printSreen()
     popup_pos = positions(d['robot'],img=screenshot)
@@ -254,11 +220,7 @@ def getBackgroundText():
         path = "./tmp/{}.png".format(str(time.time()))
         cv2.imwrite(path,data[0])
     digits = getDigits(d,data[0])
-    # cv2.imshow('test',data[0])
-    # cv2.waitKey(0)
-    # img = captchaImg(screenshot, popup_pos[0])
-    # cv2.imshow('img',img)
-    # cv2.waitKey(0)
+
     return digits
 
 def getSmallDigits(img):
@@ -284,17 +246,15 @@ def solveCaptcha():
 
     if slider_positions is None:
         return
-    # moveSlider(screenshot,3,popup_pos)
+
 
     for position in slider_positions:
         x, y = position
-        # pyautogui.moveTo(x,y,1)
-        hc.move((int(x), int(y)), 1)
+        pyautogui.moveTo(x,y,1)
         screenshot = printSreen()
         popup_pos = positions(d['robot'],img=screenshot)
         captcha_img = smallDigitsImg(screenshot, popup_pos[0])
         small_digits = getSmallDigits(captcha_img)
-        # print( 'dig: {}, background_digits: {}'.format(digits, background_digits))
         if small_digits == background_digits:
             print('FOUND!')
             pyautogui.mouseUp()
