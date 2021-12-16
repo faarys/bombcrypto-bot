@@ -8,3 +8,4 @@
 # config file
 /config/config.yaml
 /config/telegram.yaml
+/venv
