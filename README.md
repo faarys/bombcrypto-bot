@@ -14,8 +14,6 @@ aqui para ajudar o pessoal e com a esperança de ganhar um trocadinho com
 doações.  Com o tempo mais e mais pessoas foram abrindo issues, pedindo ajuda,
 e dando sugestões. Eu tento responder todo mundo.
 
-### Agradecimento especial ao desenvolvedor [Nucito](https://github.com/nucito/) pelo atual solvecaptcha. 
-
 Eu gostaria de manter este bot grátis e com o código aberto. Para que isso
 seja possível eu estou criando algumas metas de doação para que o bot possa
 ser financiado coletivamente. Atualmente eu atualizarei a barra das metas
@@ -46,7 +44,7 @@ espera do bot para dificultar ainda mais sua detecção.
 
  
 ## 🎁 Wallet
-### Wallet BEP20 (Binance Smart Chain): 0x7e665768270dF85A1D398498F9694C17e646Aa8C
+### Wallet Smart Chain(BEP20): 0x7e665768270dF85A1D398498F9694C17e646Aa8C
 ### PIX: 14c6beb5-a38a-46f1-b029-cf2e104712d0
 
 ## ⚠️ Aviso
@@ -56,7 +54,7 @@ e o uso de bots é oficialmente PROIBIDO. Não me responsabilizo por eventuais
 penalidades sofridas por quem usar o bot, use por sua própria conta e risco.
 
 ## 🪟 Instalação:
-### Baixe e instale o Python 3.9.7 pelo site [https://www.python.org/downloads/release/python-397/](https://www.python.org/downloads/release/python-397/)
+### Baixe e instale o Python 3.10.1 pelo site [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 
 É importante marcar a opção para adicionar o
