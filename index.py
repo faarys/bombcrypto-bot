@@ -377,7 +377,6 @@ def positions(target, threshold=configThreshold['default'], base_img=None, retur
 
     yloc, xloc = np.where(result >= threshold)
 
-
     rectangles = []
     for (x, y) in zip(xloc, yloc):
         rectangles.append([int(x), int(y), int(w), int(h)])
@@ -398,12 +397,10 @@ def findPuzzlePieces(result, piece_img, threshold=0.5):
     piece_h = piece_img.shape[0]
     yloc, xloc = np.where(result >= threshold)
 
-
     r= []
     for (piece_x, piece_y) in zip(xloc, yloc):
         r.append([int(piece_x), int(piece_y), int(piece_w), int(piece_h)])
         r.append([int(piece_x), int(piece_y), int(piece_w), int(piece_h)])
-
 
     r, weights = cv2.groupRectangles(r, 1, 0.2)
 
@@ -453,8 +450,6 @@ def show(rectangles = None, img = None):
     # cv2.rectangle(img, (result[0], result[1]), (result[0] + result[2], result[1] + result[3]), (255,50,255), 2)
     cv2.imshow('img',img)
     cv2.waitKey(0)
-
-
 
 def checkCaptcha():
     puzzle_pos = positions(robot)
@@ -661,8 +656,6 @@ def login():
         time.sleep(2)
         #solveCaptcha() mexendo
         checkCaptcha()
-
-
         waitForImage((sign_btn_img, metamask_unlock_img), multiple=True)
 
     metamask_unlock_coord = positions(metamask_unlock_img)
