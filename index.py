@@ -173,11 +173,31 @@ if telegramIntegration == True:
             if sendBCoinReport() is None:
                 update.message.reply_text('😿 An error has occurred')
 
+        def send_pix(update: Update, context: CallbackContext) -> None:
+            update.message.reply_text(
+                f'🎁 BCBOT Chave PIX: \n\n 14c6beb5-a38a-46f1-b029-cf2e104712d0 \n\n Muito obrigado! 😀')
+
+        def send_wallet(update: Update, context: CallbackContext) -> None:
+            update.message.reply_text(
+                f'🎁 Smart Chain Wallet: \n\n 0x7e665768270dF85A1D398498F9694C17e646Aa8C \n\n Thank You! 😀')
+
+        def send_telegram_invite(update: Update, context: CallbackContext) -> None:
+            update.message.reply_text(
+                f'💖 Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0')
+
+        def send_stop(update: Update, context: CallbackContext) -> None:
+            update.message.reply_text(
+                f'🛑 Shutting down bot...' )
+
         commands = [
             ['print', send_print],
             ['id', send_id],
             ['map', send_map],
-            ['bcoin', send_bcoin]
+            ['bcoin', send_bcoin],
+            ['pix', send_pix],
+            ['donation', send_wallet],
+            ['invite', send_telegram_invite],
+            ['stop', send_stop]
         ]
 
         for command in commands:
@@ -200,7 +220,6 @@ def sendTelegramMessage(message):
     except:
         # logger('Error to send telegram message. See configuration file', emoji='📄')
         return
-
 
 def sendTelegramPrint():
     if telegramIntegration == False:
@@ -345,7 +364,6 @@ def sendMapReport():
     logger('Map report sent', telegram=True, emoji='📄')
     return True
 
-
 def clickButton(img, name=None, timeout=3, threshold=configThreshold['default']):
     if not name is None:
         pass
@@ -380,17 +398,6 @@ def printScreen():
         return sct_img[:, :, :3]
 
 
-def printSreen():
-    with mss.mss() as sct:
-        monitor = sct.monitors[0]
-        sct_img = np.array(sct.grab(monitor))
-        # The screen part to capture
-        # monitor = {"top": 160, "left": 160, "width": 1000, "height": 135}
-
-        # Grab the data
-        return sct_img[:, :, :3]
-
-
 def positions(target, threshold=configThreshold['default'], base_img=None, return_0=False):
     if base_img is None:
         img = printScreen()
@@ -419,55 +426,6 @@ def positions(target, threshold=configThreshold['default'], base_img=None, retur
     else:
         return rectangles
 
-
-def findPuzzlePieces(result, piece_img, threshold=0.5):
-    piece_w = piece_img.shape[1]
-    piece_h = piece_img.shape[0]
-    yloc, xloc = np.where(result >= threshold)
-
-    r = []
-    for (piece_x, piece_y) in zip(xloc, yloc):
-        r.append([int(piece_x), int(piece_y), int(piece_w), int(piece_h)])
-        r.append([int(piece_x), int(piece_y), int(piece_w), int(piece_h)])
-
-    r, weights = cv2.groupRectangles(r, 1, 0.2)
-
-    if len(r) < 2:
-        # print('threshold = %.3f' % threshold)
-        return findPuzzlePieces(result, piece_img, threshold-0.01)
-
-    if len(r) == 2:
-        # print('match')
-        return r
-
-    if len(r) > 2:
-        # logger('🧩 Overshoot by %d attempts' % len(r))
-
-        return r
-
-
-def getRightPiece(puzzle_pieces):
-    if puzzle_pieces is False:
-        return False
-
-    xs = [row[0] for row in puzzle_pieces]
-    index_of_right_rectangle = xs.index(max(xs))
-
-    right_piece = puzzle_pieces[index_of_right_rectangle]
-    return right_piece
-
-
-def getLeftPiece(puzzle_pieces):
-    if puzzle_pieces is False:
-        return False
-
-    xs = [row[0] for row in puzzle_pieces]
-    index_of_left_rectangle = xs.index(min(xs))
-
-    left_piece = puzzle_pieces[index_of_left_rectangle]
-    return left_piece
-
-
 def show(rectangles=None, img=None):
 
     if img is None:
@@ -488,7 +446,6 @@ def checkCaptcha():
     puzzle_pos = positions(robot)
     if puzzle_pos is not False:
         logger('Captcha detected.', telegram=True, emoji='🧩')
-        # r = requests.get('http://api.btscenter.net/telegram/call.php?user=@XXXXXXXXXXX&text=Verifique+o+sistema+anti+bot&lang=pt-BR-Wavenet-B')
         solveCaptcha()
     else:
         return True
@@ -892,8 +849,9 @@ def checkUpdates():
     try:
         streamVersionGithub = yaml.safe_load(data.text)
         version = streamVersionGithub['version']
+        emergency = streamVersionGithub['emergency']
     except KeyError:
-        logger('Version not found in github', emoji='💥')
+        logger('Version not found in github, securety problem', emoji='💥')
         version = "0"
 
     print('Git Version: ' + version)
@@ -906,16 +864,22 @@ def checkUpdates():
     except FileNotFoundError:
         versionLocal = None
 
+    #Allow BCBOT to be stopped remotely in case of emergency 
+    if (emergency == 'true' and version > versionLocal):
+        logger('Update is required for your security',
+               telegram=True, emoji='🆘')
+        exit()
+
     if versionLocal is not None:
         print('Version installed: ' + versionLocal)
         if version > versionLocal:
             logger('New version ' + version +
-                   ' available, please update', telegram=True, emoji='🎉')
+                   ' available, please update', telegram=True, emoji='🎉'),
+            print(emergency)
     else:
         logger('Version not found, update is required',
                telegram=True, emoji='💥')
         exit()
-
 
 def checkThreshold():
     global configThreshold
@@ -932,6 +896,8 @@ def main():
     checkUpdates()
     input('Press Enter to start the bot...\n')
     logger('Starting bot...', telegram=True, emoji='🤖')
+    logger('Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0', telegram=True, emoji='💖')
+    logger('Commands: \n\n /print \n /map \n /bcoin \n /invite \n /id \n /donation \n /pix \n\n /stop - Stop bot', telegram=True, emoji='ℹ️')
 
     last = {
         "login": 0,
