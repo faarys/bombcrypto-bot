@@ -5,6 +5,9 @@
 # vscode plugins
 /.history
 
+# BCBOTV2 (IN DEVELOPMENT)
+/bcbot.exe
+
 # config file
 /config/config.yaml
 /config/telegram.yaml
