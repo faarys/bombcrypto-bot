@@ -875,7 +875,6 @@ def checkUpdates():
         if version > versionLocal:
             logger('New version ' + version +
                    ' available, please update', telegram=True, emoji='🎉'),
-            print(emergency)
     else:
         logger('Version not found, update is required',
                telegram=True, emoji='💥')
