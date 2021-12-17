@@ -9,3 +9,5 @@
 /config/config.yaml
 /config/telegram.yaml
 /venv
+
+.editorconfig
