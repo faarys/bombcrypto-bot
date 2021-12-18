@@ -23,15 +23,11 @@ alguma forma.
 - [x] 1 - Inserir um valor aleatório em todos os movimentos e os intervalos de
 espera do bot para dificultar ainda mais sua detecção.
 
-- [x] 2 - Implementar com o telegram para facilitar o gerenciamento.
+- [x] 2 - Integrar com o Telegram para facilitar o gerenciamento.
 
 - [x] 3 - Implementar Movimentos "Humanizados" para evitar detecção.
 
 - [ ] 4 - Implementar uma tecla para fechar o bot.
-
-- [ ] 5 - Implementar para ligar pelo Telegram.
-
-- [ ] 6 - Implementar multi account.
 
 
 ``` 
@@ -81,7 +77,7 @@ Digite o comando "cd" + caminho que você copiou:
 ### Instale as dependências:
 
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --force
 ```
 
   
