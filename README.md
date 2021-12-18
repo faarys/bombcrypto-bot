@@ -3,7 +3,7 @@
 ![Bomb Crypto Banner](https://raw.githubusercontent.com/bts22/bombcrypto-bot/main/images/readme/banner.jpg)
 
   <a>
-    Bomb Crypto Bot
+    BCBOT - BombCrypto Bot Free
   </a>
 </h1>
 
