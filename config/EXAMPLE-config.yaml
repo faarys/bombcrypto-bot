@@ -67,11 +67,11 @@
   #
   threshold:
     # [en_US]
-    # Default value: 0.7
+    # Default value: 0.85
     #
     # [pt_BR]
-    # Valor padrão: 0.7
-    default: 0.7
+    # Valor padrão: 0.85
+    default: 0.85
 
     # [en_US]
     # Default value: 0.5
