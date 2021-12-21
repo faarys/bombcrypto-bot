@@ -27,15 +27,19 @@ espera do bot para dificultar ainda mais sua detecção.
 
 - [x] 3 - Implementar Movimentos "Humanizados" para evitar detecção.
 
-- [ ] 4 - Implementar uma tecla para fechar o bot.
+- [x] 4 - Multi Account.
+
+- [ ] 5 - Implementar para receber ligação se parar de farmar.
+
+- [ ] 6 - Implementar uma tecla para fechar o bot.
 
 
 ``` 
-- 18/Dec/21
+- 21/Dec/21
              (15%)        (30%)         (50%)        (70%)      (85%)     (100%)
 [--------------|------------|-------------|------------|----------|---------] ($500)
-     |
-    $25
+       |
+      $45
 ```
 
  
