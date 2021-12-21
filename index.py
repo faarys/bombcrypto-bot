@@ -897,6 +897,7 @@ def main():
     logger('Starting bot...', telegram=True, emoji='🤖')
     logger('Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0', telegram=True, emoji='💖')
     logger('Commands: \n\n /print \n /map \n /bcoin \n /invite \n /id \n /donation \n /pix \n\n /stop - Stop bot', telegram=True, emoji='ℹ️')
+    logger('Multi Account BETA is available. Run: python index-ma.py and not index.py for tests.', telegram=True, emoji='💡')
 
     last = {
         "login": 0,
