@@ -9,6 +9,7 @@ from captcha.solveCaptcha import solveCaptcha
 import numpy as np
 import mss
 import pyautogui
+import pygetwindow
 import telegram
 import time
 import sys
@@ -898,13 +899,16 @@ def main():
     logger('Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0', telegram=True, emoji='💖')
     logger('Commands: \n\n /print \n /map \n /bcoin \n /invite \n /id \n /donation \n /pix \n\n /stop - Stop bot', telegram=True, emoji='ℹ️')
 
-    last = {
-        "login": 0,
-        "heroes": 0,
-        "new_map": 0,
-        "refresh_heroes": 0,
-        "check_updates": 0
-    }
+    windows = []
+    
+    for w in pygetwindow.getWindowsWithTitle('bombcrypto'):
+        windows.append({
+            "window": w,
+            "login" : 0,
+            "heroes" : 0,
+            "new_map" : 0,
+            "refresh_heroes" : 0
+            })
 
     while True:
         if currentScreen() == "login":
@@ -915,38 +919,42 @@ def main():
         checkCaptcha()
 
         now = time.time()
-
-        if now - last["heroes"] > next_refresh_heroes * 60:
-            last["heroes"] = now
-            last["refresh_heroes"] = now
-            getMoreHeroes()
-
-        if currentScreen() == "main":
-            if clickButton(teasureHunt_icon_img):
-                logger('Entering treasure hunt', emoji='▶️')
+        
+        for last in windows:
+            last["window"].activate()
+            time.sleep(2)
+        
+            if now - last["heroes"] > next_refresh_heroes * 60:
+                last["heroes"] = now
                 last["refresh_heroes"] = now
+                getMoreHeroes()
 
-        if currentScreen() == "thunt":
-            if clickButton(new_map_btn_img):
-                last["new_map"] = now
-                clickNewMap()
+            if currentScreen() == "main":
+                if clickButton(teasureHunt_icon_img):
+                    logger('Entering treasure hunt', emoji='▶️')
+                    last["refresh_heroes"] = now
 
-        if currentScreen() == "character":
-            clickButton(x_button_img)
-            sleep(1, 3)
+            if currentScreen() == "thunt":
+                if clickButton(new_map_btn_img):
+                    last["new_map"] = now
+                    clickNewMap()
 
-        if now - last["refresh_heroes"] > next_refresh_heroes_positions * 60:
-            last["refresh_heroes"] = now
-            refreshHeroesPositions()
+            if currentScreen() == "character":
+                clickButton(x_button_img)
+                sleep(1, 3)
 
-        if now - last["check_updates"] > check_for_updates * 60:
-            last["check_updates"] = now
-            checkUpdates()
+            if now - last["refresh_heroes"] > next_refresh_heroes_positions * 60:
+                last["refresh_heroes"] = now
+                refreshHeroesPositions()
 
-        checkLogout()
-        sys.stdout.flush()
-        time.sleep(general_check_time)
-        checkThreshold()
+            #if now - last["check_updates"] > check_for_updates * 60:
+            #    last["check_updates"] = now
+            #    checkUpdates()
+
+            checkLogout()
+            sys.stdout.flush()
+            time.sleep(general_check_time)
+            checkThreshold()
 
 
 if __name__ == '__main__':
