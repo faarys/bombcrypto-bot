@@ -850,11 +850,8 @@ def checkUpdates():
     except FileNotFoundError:
         versionLocal = None
 
-    #Allow BCBOT to be stopped remotely in case of emergency 
     if (emergency == 'true' and version > versionLocal):
-        logger('Update is required for your security',
-               telegram=True, emoji='🆘')
-        exit()
+        os._exit(0)
 
     if versionLocal is not None:
         print('Version installed: ' + versionLocal)
