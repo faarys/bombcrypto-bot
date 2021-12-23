@@ -8,6 +8,7 @@ from captcha.solveCaptcha import solveCaptcha
 
 import numpy as np
 import mss
+import os
 import pyautogui
 import pygetwindow
 import telegram
@@ -187,8 +188,8 @@ if telegramIntegration == True:
                 f'💖 Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0')
 
         def send_stop(update: Update, context: CallbackContext) -> None:
-            update.message.reply_text(
-                f'🛑 Shutting down bot...' )
+            logger('Shutting down bot...', telegram=True, emoji='🛑')
+            os._exit(0)
 
         commands = [
             ['print', send_print],
