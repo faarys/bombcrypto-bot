@@ -4,12 +4,12 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 from src.date import dateFormatted
-from captcha.solveCaptcha import solveCaptcha
 
 import numpy as np
 import mss
 import pyautogui
 import telegram
+import os
 import time
 import sys
 import yaml
@@ -186,9 +186,9 @@ if telegramIntegration == True:
                 f'💖 Join us on BCBOT Telegram group: https://t.me/+WXjrE1Kdb1U1Mzg0')
 
         def send_stop(update: Update, context: CallbackContext) -> None:
-            update.message.reply_text(
-                f'🛑 Shutting down bot...' )
-
+            logger('Shutting down bot...', telegram=True, emoji='🛑')
+            os._exit(0)
+               
         commands = [
             ['print', send_print],
             ['id', send_id],
@@ -442,15 +442,6 @@ def show(rectangles=None, img=None):
     cv2.waitKey(0)
 
 
-def checkCaptcha():
-    puzzle_pos = positions(robot)
-    if puzzle_pos is not False:
-        logger('Captcha detected.', telegram=True, emoji='🧩')
-        solveCaptcha()
-    else:
-        return True
-
-
 def scroll():
     offset = offsets['character_indicator']
     offset_random = random.uniform(offset[0], offset[1])
@@ -620,12 +611,10 @@ def goToHeroes():
             sleep(1, 3)
             if clickButton(hero_img):
                 sleep(1, 3)
-                checkCaptcha()
                 waitForImage(home_img)
     if currentScreen() == "main":
         if clickButton(hero_img):
             sleep(1, 3)
-            checkCaptcha()
             waitForImage(home_img)
     if currentScreen() == "unknown" or currentScreen() == "login":
         checkLogout()
@@ -667,8 +656,6 @@ def login():
     if clickButton(connect_wallet_btn_img):
         logger('Connect wallet button detected, logging in!', emoji='🎉')
         time.sleep(2)
-        # solveCaptcha() mexendo
-        checkCaptcha()
         waitForImage((sign_btn_img, metamask_unlock_img), multiple=True)
 
     metamask_unlock_coord = positions(metamask_unlock_img)
@@ -823,7 +810,6 @@ def waitForImage(imgs, timeout=30, threshold=0.5, multiple=False):
 def clickNewMap():
     logger('New map', emoji='🗺️')
     sleep(1, 2)
-    checkCaptcha()
     sleep(2, 3)
     sendMapReport()
     sleep(3, 5)
@@ -912,8 +898,6 @@ def main():
             login()
 
         handleError()
-
-        checkCaptcha()
 
         now = time.time()
 
