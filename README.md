@@ -29,9 +29,9 @@ espera do bot para dificultar ainda mais sua detecção.
 
 - [x] 4 - Multi Account.
 
-- [x] 5 - Implementar uma tecla para fechar o bot.
+- [x] 5 - Implementar para fechar o bot pelo Telegram com o comando /stop
 
-- [ ] 6 - Implementar com BTS Herald para receber uma ligação se o bot parar (quando completar o objetivo das doações).
+- [ ] 6 - Integrar com BTS Herald para receber uma ligação se o bot parar (quando completar a meta das doações).
 
 
 ``` 
