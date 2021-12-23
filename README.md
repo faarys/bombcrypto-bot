@@ -29,9 +29,9 @@ espera do bot para dificultar ainda mais sua detecção.
 
 - [x] 4 - Multi Account.
 
-- [ ] 5 - Implementar para receber ligação se parar de farmar.
+- [x] 5 - Implementar uma tecla para fechar o bot.
 
-- [ ] 6 - Implementar uma tecla para fechar o bot.
+- [ ] 6 - Implementar com BTS Herald para receber uma ligação se o bot parar (quando completar o objetivo das doações).
 
 
 ``` 
